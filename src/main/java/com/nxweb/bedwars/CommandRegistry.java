@@ -8,20 +8,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class CommandRegistry {
-    public static LiteralCommandNode<CommandSourceStack> OpenStore(final Store store) {
+    public static LiteralCommandNode<CommandSourceStack> OpenStore(final Shop shop) {
         return Commands.literal("openStore")
+                .requires(source -> source.getExecutor() instanceof Player && source.getSender().isOp()) // Requires operator level 2
                 .executes(ctx -> {
                     final CommandSender sender = ctx.getSource().getSender();
 
                     if (sender instanceof Player player) {
-                        store.openCustomInventory(player);
-
-                        sender.sendPlainMessage("inventory opened");
-                        // Perform player-specific actions
+                            shop.openCustomInventory(player);
+                            sender.sendPlainMessage("inventory opened");
+                            // Perform player-specific actions
                     } else {
                         sender.sendMessage("Only players can use this command.");
                     }
-
 
                     return Command.SINGLE_SUCCESS;
                 })

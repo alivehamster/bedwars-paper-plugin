@@ -14,13 +14,13 @@ public class Main extends JavaPlugin implements Listener{
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
 
-        Store Store = new Store();
+        Shop Shop = new Shop();
 
-        Bukkit.getPluginManager().registerEvents(Store, this);
+        Bukkit.getPluginManager().registerEvents(Shop, this);
 
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            commands.registrar().register(CommandRegistry.OpenStore(Store));
+            commands.registrar().register(CommandRegistry.OpenStore(Shop));
         });
     }
 
