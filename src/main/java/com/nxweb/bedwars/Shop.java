@@ -1,5 +1,6 @@
 package com.nxweb.bedwars;
 
+import lol.pyr.znpcsplus.api.event.NpcInteractEvent;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -10,11 +11,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class Shop implements Listener {
     private final Inventory customInventory;
+    private final JavaPlugin plugin;
 
-    public Shop() {
+    public Shop(JavaPlugin plugin) {
+        this.plugin = plugin;
         // Create a custom inventory with 9 slots and a title
         customInventory = Bukkit.createInventory(null, 9, Component.text("Shop"));
 
@@ -48,6 +52,15 @@ public class Shop implements Listener {
                     player.sendMessage(Component.text("You need 4 gold to click this item!"));
                 }
             }
+        }
+    }
+
+    @EventHandler
+    public void onNpcInteract(NpcInteractEvent event) {
+        if (event.getEntry().getId().startsWith("bedwars-shop")) {
+            var player = event.getPlayer();
+            // Schedule inventory opening to run on the main server thread
+            Bukkit.getScheduler().runTask(plugin, () -> openCustomInventory(player));
         }
     }
 }

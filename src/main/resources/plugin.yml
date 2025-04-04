@@ -5,3 +5,4 @@ description: Bedwars Plugin
 author: alivehamster
 website: https://nxweb.com
 api-version: '1.21.4'
+depend: [ZNPCsPlus]

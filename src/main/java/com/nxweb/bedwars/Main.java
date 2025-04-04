@@ -1,6 +1,9 @@
 package com.nxweb.bedwars;
 
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import lol.pyr.znpcsplus.api.NpcApi;
+import lol.pyr.znpcsplus.api.NpcApiProvider;
+import lol.pyr.znpcsplus.api.npc.NpcType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -14,13 +17,20 @@ public class Main extends JavaPlugin implements Listener{
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
 
-        Shop Shop = new Shop();
+        Shop Shop = new Shop(this);
 
         Bukkit.getPluginManager().registerEvents(Shop, this);
 
+        NpcApi npcApi = NpcApiProvider.get();
+        NpcType playerNpcType = npcApi.getNpcTypeRegistry().getByName("player"); // Case-insensitive
+        if (playerNpcType == null) {
+            System.out.println("NPC type does not exist or is not available on this server version.");
+            return;
+        }
+
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
-            commands.registrar().register(CommandRegistry.OpenStore(Shop));
+            commands.registrar().register(CommandRegistry.createShop(npcApi, playerNpcType));
         });
     }
 
