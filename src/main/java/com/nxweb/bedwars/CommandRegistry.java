@@ -11,8 +11,14 @@ import lol.pyr.znpcsplus.api.npc.NpcType;
 import lol.pyr.znpcsplus.util.NpcLocation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.entity.Player;
-
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.persistence.PersistentDataContainer;
 
 public class CommandRegistry {
     public static LiteralCommandNode<CommandSourceStack> createShop(final NpcApi npcApi, final NpcType NpcType) {
@@ -44,6 +50,16 @@ public class CommandRegistry {
                     player.sendMessage(Component.text("Use ZNPCsPlus commands to edit the NPC: ")
                             .append(Component.text("https://github.com/Pyrbu/ZNPCsPlus/wiki/Commands")
                             .clickEvent(ClickEvent.openUrl("https://github.com/Pyrbu/ZNPCsPlus/wiki/Commands"))));
+
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
+    }
+
+    public static LiteralCommandNode<CommandSourceStack> giveSpecialBed() {
+        return Commands.literal("giveSpecialBed")
+                .requires(source -> source.getExecutor() instanceof Player && source.getSender().isOp())
+                .executes(ctx -> {
 
                     return Command.SINGLE_SUCCESS;
                 })

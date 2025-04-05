@@ -1,5 +1,15 @@
 plugins {
     id("java")
+    id("xyz.jpenilla.run-paper") version "2.3.1"
+}
+
+tasks {
+    runServer {
+        downloadPlugins {
+            url("https://ci.pyr.lol/job/ZNPCsPlus/lastSuccessfulBuild/artifact/plugin/build/libs/ZNPCsPlus-2.1.0-SNAPSHOT.jar")
+        }
+        minecraftVersion("1.21.4")
+    }
 }
 
 group = "com.nxweb"
