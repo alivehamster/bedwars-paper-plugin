@@ -27,7 +27,7 @@ public class Main extends JavaPlugin  {
 
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(CommandRegistry.createShop(npcApi, playerNpcType));
-            commands.registrar().register(CommandRegistry.giveSpecialBed(key));
+            commands.registrar().register(CommandRegistry.giveTeamBed(key));
         });
     }
 }

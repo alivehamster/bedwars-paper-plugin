@@ -90,7 +90,8 @@ public class Listeners implements Listener {
                 Integer value = item.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
                 if(value != null) {
                     if (mainBlock.getState() instanceof Bed bed) {
-                        bed.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, value);
+                        String color = bed.getColor().toString();
+                        bed.getPersistentDataContainer().set(key, PersistentDataType.STRING, color);
                         bed.update();
                         player.sendMessage(Component.text("You placed a special bed!").color(TextColor.color(0x13f832)));
 
@@ -106,7 +107,7 @@ public class Listeners implements Listener {
 
         // Check if the broken block is a bed
         if(block.getState() instanceof Bed bed) {
-            Integer specialBed = bed.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+            String specialBed = bed.getPersistentDataContainer().get(key, PersistentDataType.STRING);
             System.out.println(specialBed);
         }
 
