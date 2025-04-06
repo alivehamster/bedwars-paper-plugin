@@ -1,5 +1,7 @@
 package com.nxweb.bedwars;
 
+import io.papermc.paper.persistence.PersistentDataContainerView;
+import io.papermc.paper.persistence.PersistentDataViewHolder;
 import lol.pyr.znpcsplus.api.event.NpcInteractEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -7,11 +9,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Server;
+import org.bukkit.block.Bed;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockMultiPlaceEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,10 +30,13 @@ public class Listeners implements Listener {
 
     private final JavaPlugin plugin;
     private final Shop shop;
+    private final NamespacedKey key;
 
-    public Listeners(JavaPlugin plugin, Shop shop) {
+
+    public Listeners(JavaPlugin plugin, Shop shop, NamespacedKey key) {
         this.plugin = plugin;
         this.shop = shop;
+        this.key = key;
     }
 
     @EventHandler
@@ -69,12 +77,39 @@ public class Listeners implements Listener {
     }
 
     @EventHandler
+    public void onMultiBlockPlace(BlockMultiPlaceEvent event) {
+        // This event is triggered for beds which are multi-block structures
+        Block mainBlock = event.getBlock();
+
+        if (mainBlock.getType().name().endsWith("_BED")) {
+            Player player = event.getPlayer();
+            ItemStack item = event.getItemInHand();
+
+            // Check if the key exists before attempting to retrieve its value
+            if (item.getPersistentDataContainer().has(key)) {
+                Integer value = item.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+                if(value != null) {
+                    if (mainBlock.getState() instanceof Bed bed) {
+                        bed.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, value);
+                        bed.update();
+                        player.sendMessage(Component.text("You placed a special bed!").color(TextColor.color(0x13f832)));
+
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
     public void onBedBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
-        
-        // Check if the broken block is a bed
-        if (block.getType().name().endsWith("_BED")) {
 
+        // Check if the broken block is a bed
+        if(block.getState() instanceof Bed bed) {
+            Integer specialBed = bed.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
+            System.out.println(specialBed);
         }
+
+
     }
 }

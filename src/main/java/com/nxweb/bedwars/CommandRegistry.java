@@ -56,13 +56,28 @@ public class CommandRegistry {
                 .build();
     }
 
-    public static LiteralCommandNode<CommandSourceStack> giveSpecialBed() {
+    public static LiteralCommandNode<CommandSourceStack> giveSpecialBed(NamespacedKey key) {
         return Commands.literal("giveSpecialBed")
                 .requires(source -> source.getExecutor() instanceof Player && source.getSender().isOp())
                 .executes(ctx -> {
+                    Player player = (Player) ctx.getSource().getExecutor();
+                    if(player != null) {
+                        ItemStack item = ItemStack.of(Material.RED_BED);
+                        item.editMeta(meta -> {
+                            // Ensure we're consistently using INTEGER
+                            meta.getPersistentDataContainer().set(key, PersistentDataType.INTEGER, 1);
+                            
+                            // Add a display name to make it clear this is a special bed
+                            meta.displayName(Component.text("Special Bed")
+                                .color(TextColor.color(0xFF55FF)));
+                        });
+                        player.getInventory().addItem(item);
+                        player.sendMessage(Component.text("You received a special bed!"));
+                    }
 
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();
     }
 }
+
