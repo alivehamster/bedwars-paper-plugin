@@ -157,7 +157,6 @@ public class Listeners implements Listener {
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     player.setGameMode(org.bukkit.GameMode.SPECTATOR);
                     player.getInventory().clear();
-                    event.setCancelled(true);
                     player.sendMessage(Component.text("Your bed was destroyed! You are now a spectator.")
                             .color(TextColor.color(0xFF5555)));
                 });
