@@ -30,13 +30,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class CommandRegistry {
-    // List of all available bed colors in Minecraft
-    private static final List<String> BED_COLORS = Arrays.asList(
-        "RED", "BLACK", "BLUE", "BROWN", "CYAN", "GRAY", "GREEN", 
-        "LIGHT_BLUE", "LIGHT_GRAY", "LIME", "MAGENTA", "ORANGE", 
-        "PINK", "PURPLE", "WHITE", "YELLOW"
-    );
-    
+
     public static LiteralCommandNode<CommandSourceStack> createShop(final NpcApi npcApi, final NpcType NpcType) {
         return Commands.literal("createShop")
                 .requires(source -> source.getExecutor() instanceof Player && source.getSender().isOp() )
@@ -71,6 +65,11 @@ public class CommandRegistry {
                 })
                 .build();
     }
+
+    private static final List<String> BED_COLORS = Arrays.asList(
+            "RED", "BLACK", "BLUE", "LIME",
+            "PINK", "PURPLE", "WHITE", "YELLOW"
+    );
 
     public static LiteralCommandNode<CommandSourceStack> giveTeamBed(NamespacedKey key) {
         return Commands.literal("giveTeamBed")
@@ -127,6 +126,17 @@ public class CommandRegistry {
                         player.getInventory().addItem(item);
                         player.sendMessage(Component.text("Team Bed"));
                     }
+
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
+    }
+
+    public static LiteralCommandNode<CommandSourceStack> startBedwars(Teams teams) {
+        return Commands.literal("startBedwars")
+                .requires(source-> source.getSender().isOp() )
+                .executes(ctx -> {
+                    teams.createTeamsForAllPlayers();
 
                     return Command.SINGLE_SUCCESS;
                 })

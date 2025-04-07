@@ -4,6 +4,7 @@ import io.papermc.paper.persistence.PersistentDataContainerView;
 import io.papermc.paper.persistence.PersistentDataViewHolder;
 import lol.pyr.znpcsplus.api.event.NpcInteractEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -17,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockMultiPlaceEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -31,12 +33,14 @@ public class Listeners implements Listener {
     private final JavaPlugin plugin;
     private final Shop shop;
     private final NamespacedKey key;
+    private final Teams teams;
 
 
-    public Listeners(JavaPlugin plugin, Shop shop, NamespacedKey key) {
+    public Listeners(JavaPlugin plugin, Shop shop, NamespacedKey key, Teams teams) {
         this.plugin = plugin;
         this.shop = shop;
         this.key = key;
+        this.teams = teams;
     }
 
     @EventHandler
@@ -93,7 +97,7 @@ public class Listeners implements Listener {
                         String color = bed.getColor().toString();
                         bed.getPersistentDataContainer().set(key, PersistentDataType.STRING, color);
                         bed.update();
-                        player.sendMessage(Component.text("You placed a special bed!").color(TextColor.color(0x13f832)));
+                        player.sendMessage(Component.text("You placed a team bed!").color(TextColor.color(0x13f832)));
 
                     }
                 }
@@ -107,10 +111,58 @@ public class Listeners implements Listener {
 
         // Check if the broken block is a bed
         if(block.getState() instanceof Bed bed) {
-            String specialBed = bed.getPersistentDataContainer().get(key, PersistentDataType.STRING);
-            System.out.println(specialBed);
+            String teamBedColor = bed.getPersistentDataContainer().get(key, PersistentDataType.STRING);
+            System.out.println(teamBedColor);
+            
+            // Use the mapping to get the correct NamedTextColor from bed color string
+            if (teamBedColor != null) {
+                NamedTextColor namedColor = teams.getTeamColorFromBedColor(teamBedColor);
+                if (namedColor != null) {
+                    // Find and remove the color from aliveTeams
+                    for (int i = 0; i < teams.aliveTeams.length; i++) {
+                        if (teams.aliveTeams[i] != null && teams.aliveTeams[i].equals(namedColor)) {
+                            teams.aliveTeams[i] = null;
+                            
+                            // Broadcast bed broken message
+                            Bukkit.getServer().sendMessage(
+                                    Component.text("Team " + teamBedColor + "'s bed has been destroyed!")
+                                            .color(TextColor.color(0xFF5555))
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
         }
+    }
 
-
+    @EventHandler
+    public void onDeath(PlayerDeathEvent event){
+        Player player = event.getPlayer();
+        TextColor teamColor = teams.getPlayerTeamColor(player);
+        
+        if (teamColor != null) {
+            // Check if player's team color is in aliveTeams
+            boolean teamStillAlive = false;
+            for (NamedTextColor aliveTeam : teams.aliveTeams) {
+                if (aliveTeam != null && aliveTeam.equals(teamColor)) {
+                    teamStillAlive = true;
+                    break;
+                }
+            }
+            
+            // If team color not found in aliveTeams, set player to spectator mode
+            if (!teamStillAlive) {
+                // Schedule to run on the next tick to avoid issues during the death event
+                Bukkit.getScheduler().runTask(plugin, () -> {
+                    player.setGameMode(org.bukkit.GameMode.SPECTATOR);
+                    player.getInventory().clear();
+                    event.setCancelled(true);
+                    player.sendMessage(Component.text("Your bed was destroyed! You are now a spectator.")
+                            .color(TextColor.color(0xFF5555)));
+                });
+            }
+        }
     }
 }
+

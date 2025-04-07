@@ -15,8 +15,9 @@ public class Main extends JavaPlugin  {
 
         NamespacedKey key = new NamespacedKey(this, "bedwars");
         Shop shop = new Shop();
+        Teams teams = new Teams();
 
-        Bukkit.getPluginManager().registerEvents(new Listeners(this, shop, key), this);
+        Bukkit.getPluginManager().registerEvents(new Listeners(this, shop, key, teams), this);
 
         NpcApi npcApi = NpcApiProvider.get();
         NpcType playerNpcType = npcApi.getNpcTypeRegistry().getByName("player"); // Case-insensitive
@@ -28,6 +29,7 @@ public class Main extends JavaPlugin  {
         this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, commands -> {
             commands.registrar().register(CommandRegistry.createShop(npcApi, playerNpcType));
             commands.registrar().register(CommandRegistry.giveTeamBed(key));
+            commands.registrar().register(CommandRegistry.startBedwars(teams));
         });
     }
 }
