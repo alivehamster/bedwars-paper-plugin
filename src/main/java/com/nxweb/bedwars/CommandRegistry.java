@@ -143,9 +143,33 @@ public class CommandRegistry {
                 })
                 .build();
     }
+
     public static LiteralCommandNode<CommandSourceStack> createItemgen(Plugin plugin) {
         return Commands.literal("createItemgen")
                 .requires(source-> source.getSender().isOp() )
+                .then(Commands.argument("x", IntegerArgumentType.integer())
+                      .then(Commands.argument("y", IntegerArgumentType.integer())
+                            .then(Commands.argument("z", IntegerArgumentType.integer())
+                                  .executes(ctx -> {
+                                      Player player = (Player) ctx.getSource().getExecutor();
+                                      int x = IntegerArgumentType.getInteger(ctx, "x");
+                                      int y = IntegerArgumentType.getInteger(ctx, "y");
+                                      int z = IntegerArgumentType.getInteger(ctx, "z");
+
+                                      new ItemGen(
+                                              plugin,
+                                              player.getWorld(),
+                                              x,
+                                              y,
+                                              z
+                                      ).start();
+                                      
+                                      player.sendMessage(Component.text("Created ItemGen at coordinates: " + x + ", " + y + ", " + z));
+                                      return Command.SINGLE_SUCCESS;
+                                  })
+                            )
+                      )
+                )
                 .executes(ctx -> {
                     Player player = (Player) ctx.getSource().getExecutor();
 
@@ -156,6 +180,8 @@ public class CommandRegistry {
                             player.getLocation().getY(),
                             player.getLocation().getZ()
                     ).start();
+                    
+                    player.sendMessage(Component.text("Created ItemGen at your location"));
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

@@ -34,4 +34,10 @@ public class Main extends JavaPlugin  {
             commands.registrar().register(CommandRegistry.createItemgen(this));
         });
     }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+        // eventually delete all teams on shutdown
+    }
 }
