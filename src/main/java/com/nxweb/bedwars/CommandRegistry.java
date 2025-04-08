@@ -24,6 +24,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Arrays;
 import java.util.List;
@@ -138,6 +139,23 @@ public class CommandRegistry {
                 .executes(ctx -> {
                     teams.createTeamsForAllPlayers();
 
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
+    }
+    public static LiteralCommandNode<CommandSourceStack> createItemgen(Plugin plugin) {
+        return Commands.literal("createItemgen")
+                .requires(source-> source.getSender().isOp() )
+                .executes(ctx -> {
+                    Player player = (Player) ctx.getSource().getExecutor();
+
+                    new ItemGen(
+                            plugin,
+                            player.getWorld(),
+                            player.getLocation().getX(),
+                            player.getLocation().getY(),
+                            player.getLocation().getZ()
+                    ).start();
                     return Command.SINGLE_SUCCESS;
                 })
                 .build();

@@ -6,6 +6,7 @@ import lol.pyr.znpcsplus.api.NpcApiProvider;
 import lol.pyr.znpcsplus.api.npc.NpcType;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 
@@ -30,6 +31,7 @@ public class Main extends JavaPlugin  {
             commands.registrar().register(CommandRegistry.createShop(npcApi, playerNpcType));
             commands.registrar().register(CommandRegistry.giveTeamBed(key));
             commands.registrar().register(CommandRegistry.startBedwars(teams));
+            commands.registrar().register(CommandRegistry.createItemgen(this));
         });
     }
 }
