@@ -9,10 +9,18 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
+
 
 public class Main extends JavaPlugin  {
     @Override
     public void onEnable() {
+        DatabaseManager db = new DatabaseManager();
+        try {
+            db.connect();
+        } catch (SQLException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         NamespacedKey key = new NamespacedKey(this, "bedwars");
         Shop shop = new Shop();
