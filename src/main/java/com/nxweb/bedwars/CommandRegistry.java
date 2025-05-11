@@ -186,4 +186,51 @@ public class CommandRegistry {
                 })
                 .build();
     }
+
+    public static LiteralCommandNode<CommandSourceStack> setBorder() {
+        return Commands.literal("setBorder")
+                .requires(source-> source.getSender().isOp())
+                .then(Commands.argument("x1", IntegerArgumentType.integer())
+                      .then(Commands.argument("z1", IntegerArgumentType.integer())
+                            .then(Commands.argument("x2", IntegerArgumentType.integer())
+                                  .then(Commands.argument("z2", IntegerArgumentType.integer())
+                                        .executes(ctx -> {
+                                            Player player = (Player) ctx.getSource().getExecutor();
+                                            int x1 = IntegerArgumentType.getInteger(ctx, "x1");
+                                            int z1 = IntegerArgumentType.getInteger(ctx, "z1");
+                                            int x2 = IntegerArgumentType.getInteger(ctx, "x2");
+                                            int z2 = IntegerArgumentType.getInteger(ctx, "z2");
+
+                                            // Calculate center of the border
+                                            double centerX = (x1 + x2) / 2.0;
+                                            double centerZ = (z1 + z2) / 2.0;
+
+                                            // Calculate the size (diameter) of the border
+                                            // Using the maximum distance to ensure all points are covered
+                                            double xSize = Math.abs(x2 - x1);
+                                            double zSize = Math.abs(z2 - z1);
+                                            double size = Math.max(xSize, zSize);
+
+                                            // Set the world border
+                                            player.getWorld().getWorldBorder().setCenter(centerX, centerZ);
+                                            player.getWorld().getWorldBorder().setSize(size);
+
+                                            player.sendMessage(Component.text("World border set with center at (" + 
+                                                    centerX + ", " + centerZ + ") and size " + size)
+                                                    .color(TextColor.color(0x55FF55)));
+
+                                            return Command.SINGLE_SUCCESS;
+                                        })
+                                  )
+                            )
+                      )
+                )
+                .executes(ctx -> {
+                    Player player = (Player) ctx.getSource().getExecutor();
+                    player.sendMessage(Component.text("Usage: /setBoarder <x1> <z1> <x2> <z2>")
+                            .color(TextColor.color(0xFF5555)));
+                    return Command.SINGLE_SUCCESS;
+                })
+                .build();
+    }
 }

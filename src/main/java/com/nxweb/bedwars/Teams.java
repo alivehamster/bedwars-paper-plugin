@@ -115,4 +115,19 @@ public class Teams {
             createPlayerTeam(player);
         }
     }
+
+    public void deleteAllTeams() {
+        // First unregister each team in playerTeams
+        for (Team team : playerTeams.values()) {
+            if (team != null) {
+                team.unregister();
+            }
+        }
+
+        // Clear the playerTeams map
+        playerTeams.clear();
+
+        // Reset color index for future team creation
+        colorIndex = 0;
+    }
 }
